@@ -1,28 +1,56 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import Card from './components/Card';
 import info from './assets/info.png';
 
-const cards = [
-                "Mushroom", "Mushroom", "Mushroom", "Mushroom",
-                "Flower", "Flower", "Flower", "Flower",
-                "Star", "Star", "Star", "Star",
-                "10 Coins", "10 Coins", 
-                "20 Coins", "20 Coins", 
-                "1UP", "1UP"
-]
-
 function App() {
+  const [cards, setCards] = useState([
+      "Mushroom", "Mushroom", "Mushroom", "Mushroom",
+      "Flower", "Flower", "Flower", "Flower",
+      "Star", "Star", "Star", "Star",
+      "10 Coins", "10 Coins", 
+      "20 Coins", "20 Coins", 
+      "1UP", "1UP"
+  ]);
   const [flippedCards, setFlippedCards] = useState<Map<number, boolean>>(new Map());
   const [showCredits, setShowCredits] = useState(false);
+  const [currentCardID, setCurrentCardID] = useState(-1);
 
   function toggleCredits() {
     setShowCredits(!showCredits);
   }
 
-  function flipCard(id: number) {
-    setFlippedCards(new Map(flippedCards).set(id, !flippedCards.get(id)));
+  async function flipCard(id: number) {
+    // flip cards
+    setFlippedCards(new Map(flippedCards).set(id, true));
+
+    // game logic
+    if (currentCardID === -1) {
+      setCurrentCardID(id);
+    } else {
+      if (cards[currentCardID] !== cards[id]) {
+        setTimeout(() => {
+          setFlippedCards(new Map(flippedCards).set(id, false));
+          setFlippedCards(new Map(flippedCards).set(currentCardID, false));
+        }, 1500);
+      }
+      // Reset the state
+      setCurrentCardID(-1);
+    }
   }
+
+  function shuffleArray(array: string[]) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  useEffect(() => {
+    const shuffledCards = shuffleArray(cards);
+    setCards(shuffledCards);
+  }, []);
 
   return (
     <div className='
