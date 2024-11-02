@@ -15,12 +15,14 @@ function App() {
   const [flippedCards, setFlippedCards] = useState<Map<number, boolean>>(new Map());
   const [showCredits, setShowCredits] = useState(false);
   const [currentCardID, setCurrentCardID] = useState(-1);
+  const [canClick, setCanClick] = useState(true);
 
   function toggleCredits() {
     setShowCredits(!showCredits);
   }
 
   async function flipCard(id: number) {
+    if (!canClick) return;
     // flip cards
     setFlippedCards(new Map(flippedCards).set(id, true));
 
@@ -30,9 +32,14 @@ function App() {
     } else {
       if (cards[currentCardID] !== cards[id]) {
         setTimeout(() => {
+          setCanClick(false);
+        }, 1);
+        
+        setTimeout(() => {
           setFlippedCards(new Map(flippedCards).set(id, false));
           setFlippedCards(new Map(flippedCards).set(currentCardID, false));
-        }, 1500);
+          setCanClick(true);
+        }, 1000);
       }
       // Reset the state
       setCurrentCardID(-1);
@@ -50,7 +57,7 @@ function App() {
   useEffect(() => {
     const shuffledCards = shuffleArray(cards);
     setCards(shuffledCards);
-  }, []);
+  }, [cards]);
 
   return (
     <div className='
